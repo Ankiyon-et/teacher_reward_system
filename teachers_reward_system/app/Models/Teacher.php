@@ -24,7 +24,7 @@ class Teacher extends Model
 
     public function grades()
     {
-        return $this->belongsToMany(Grade::class, 'teacher_grades');
+        return $this->belongsToMany(Grade::class, 'teacher_grade','teacher_id', 'grade_id');
     }
 
     public function rewards()

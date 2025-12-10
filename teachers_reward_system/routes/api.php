@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\SuperAdmin\SchoolController;
+use App\Http\Middleware\CheckRole;
 
 Route::post('/login',       [AuthController::class, 'login']);
 Route::post('/forgot',      [AuthController::class, 'forgotPassword']);
@@ -15,7 +17,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/change-password', [AuthController::class, 'changePassword']);
 
     // USER MANAGEMENT (superadmin + schooladmin)
-    Route::post('/users/superadmin', [UserManagementController::class, 'createSuperAdmin']);
-    Route::post('/users/school-admin', [UserManagementController::class, 'createSchoolAdmin']);
-    Route::post('/users/teacher', [UserManagementController::class, 'createTeacher']);
+    
+    Route::middleware(CheckRole::class . ':superadmin')->group(function () {
+        Route::apiResource('schools', SchoolController::class);
+        Route::post('/users/superadmin', [UserManagementController::class, 'createSuperAdmin']);
+    });
+
+    Route::middleware(CheckRole::class . ':superadmin,schooladmin')->group(function () {
+        Route::post('/users/school-admin', [UserManagementController::class, 'createSchoolAdmin']);    
+    });
+
+    Route::middleware(CheckRole::class . ':schooladmin')->group(function () {
+        Route::post('/users/school-admin', [UserManagementController::class, 'createSchoolAdmin']);
+        Route::post('/users/teacher', [UserManagementController::class, 'createTeacher']);    
+    });
 });

@@ -20,6 +20,6 @@ class School extends Model
 
     public function grades()
     {
-        return $this->belongsToMany(Grade::class, 'school_grades');
+        return $this->belongsToMany(Grade::class, 'school_grade', 'school_id', 'grade_id');
     }
 }
