@@ -42,22 +42,15 @@ class UserManagementController extends Controller
     // =========================================================
     public function createSchoolAdmin(Request $request)
     {
-        $this->authorizeRole($request->user(), ['superadmin', 'schooladmin']);
+        $this->authorizeRole($request->user(), ['schooladmin']);
 
         $request->validate([
-            'school_id' => 'required|exists:schools,id',
             'name'      => 'required|string',
             'email'     => 'required|email|unique:users',
             'password'  => 'required|min:6',
             'title'     => 'nullable|string'
         ]);
-
-        // School admin can only create admins for *their own* school
-        if ($request->user()->role->role_name === 'schooladmin') {
-            if ($request->user()->schoolAdmin->school_id != $request->school_id) {
-                return response()->json(['message' => 'Unauthorized'], 403);
-            }
-        }
+ 
 
         // Create user
         $user = User::create([
@@ -70,7 +63,7 @@ class UserManagementController extends Controller
         // Create school_admin record
         SchoolAdmin::create([
             'user_id'  => $user->id,
-            'school_id'=> $request->school_id,
+            'school_id'=> $request->user()->schoolAdmin->school_id,
             'title'    => $request->title
         ]);
 
@@ -92,7 +85,6 @@ class UserManagementController extends Controller
             'email'     => 'required|email|unique:users',
             'password'  => 'required|min:6',
             'subject'   => 'nullable|string',
-            'hire_date' => 'nullable|date',
         ]);
 
         // The teacher MUST belong to the school admin's school
@@ -115,7 +107,7 @@ class UserManagementController extends Controller
             'average_rating'  => 0,
             'total_rewards'   => 0,
             'status'          => 'active',
-            'hire_date'       => $request->hire_date,
+            'hire_date'       => now(),
             'school_id'       => $schoolId,
         ]);
 

@@ -7,6 +7,10 @@ use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SuperAdmin\SchoolController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
+use App\Http\Controllers\SchoolAdmin\SchoolAdminManagementController;
+use App\Http\Controllers\SchoolAdmin\SchoolGradeManagementController;
+use App\Http\Controllers\SchoolAdmin\SchoolTeacherManagementController;
+use App\Http\Controllers\SuperAdmin\GradeController;
 
 Route::post('/login',       [AuthController::class, 'login']);
 Route::post('/forgot',      [AuthController::class, 'forgotPassword']);
@@ -21,21 +25,29 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::middleware(CheckRole::class . ':superadmin')->group(function () {
         Route::apiResource('schools', SchoolController::class);
+        Route::apiResource('grades', GradeController::class);
         Route::post('/users/superadmin', [UserManagementController::class, 'createSuperAdmin']);
         Route::prefix('super-admins')->group(function () {
             Route::get('/', [SuperAdminController::class, 'index']);
             Route::put('/{id}', [SuperAdminController::class, 'update']);
             Route::patch('/{id}', [SuperAdminController::class, 'update']);
             Route::delete('/{id}', [SuperAdminController::class, 'destroy']);
-        });
-    });
-
-    Route::middleware(CheckRole::class . ':superadmin,schooladmin')->group(function () {
-        Route::post('/users/school-admin', [UserManagementController::class, 'createSchoolAdmin']);    
+        }); 
     });
 
     Route::middleware(CheckRole::class . ':schooladmin')->group(function () {
-        Route::post('/users/school-admin', [UserManagementController::class, 'createSchoolAdmin']);
-        Route::post('/users/teacher', [UserManagementController::class, 'createTeacher']);    
+        Route::post('/create/school-admins', [UserManagementController::class, 'createSchoolAdmin']);
+        Route::get('/list/school-admins', [SchoolAdminManagementController::class, 'index']);
+        Route::delete('/delete/school-admins/{adminId}', [SchoolAdminManagementController::class, 'destroy']);
+
+        Route::post('/create/teachers', [UserManagementController::class, 'createTeacher']);
+        Route::get('/list/teachers', [SchoolTeacherManagementController::class, 'index']);
+        Route::post('/teachers/{teacherId}/assign-grades', [SchoolTeacherManagementController::class, 'assignGrades']);
+        Route::delete('/delete/teachers/{teacherId}', [SchoolTeacherManagementController::class, 'destroy']);
+
+        Route::get('/allgrades', [SchoolGradeManagementController::class, 'allGrades']);
+        Route::post('/grades/assign', [SchoolGradeManagementController::class, 'assignGradesToSchool']);
+        Route::get('/school/grades', [SchoolGradeManagementController::class, 'schoolGrades']);
+        Route::delete('/delete/grades/{gradeId}', [SchoolGradeManagementController::class, 'deleteSchoolGrade']);
     });
 });
