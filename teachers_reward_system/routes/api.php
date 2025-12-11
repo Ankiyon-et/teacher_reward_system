@@ -11,6 +11,7 @@ use App\Http\Controllers\SchoolAdmin\SchoolAdminManagementController;
 use App\Http\Controllers\SchoolAdmin\SchoolGradeManagementController;
 use App\Http\Controllers\SchoolAdmin\SchoolTeacherManagementController;
 use App\Http\Controllers\SuperAdmin\GradeController;
+use App\Http\Controllers\SuperAdmin\DashboardController;
 
 Route::post('/login',       [AuthController::class, 'login']);
 Route::post('/forgot',      [AuthController::class, 'forgotPassword']);
@@ -33,6 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::patch('/{id}', [SuperAdminController::class, 'update']);
             Route::delete('/{id}', [SuperAdminController::class, 'destroy']);
         }); 
+        Route::get('/superadmin/dashboard', [DashboardController::class, 'index']);
     });
 
     Route::middleware(CheckRole::class . ':schooladmin')->group(function () {
