@@ -1,0 +1,58 @@
+name: Deploy Laravel App to cPanel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ftp-deploy:
+    name: 🚀 Deploy Laravel to cPanel
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout your repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2️⃣ Set local dir — Laravel project folder
+      - name: Prepare local folder
+        run: echo "Using local dir:teachers_reward_system/"
+
+      # 3️⃣ Setup PHP
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      # 4️⃣ Install Composer dependencies (in your subfolder!)
+      - name: Install Composer dependencies
+        run: |
+          cd teachers_reward_system
+          composer install --no-dev --optimize-autoloader
+
+      # 5️⃣ Build frontend (optional)
+      - name: Build frontend
+        run: |
+          cd teachers_reward_system
+          npm install || true
+          npm run build || true
+
+      # 6️⃣ Deploy via FTP
+      - name: 🚀 Upload to cPanel via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.3
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: teachers_reward_system/     # 👈 MUST END WITH /
+          server-dir: ${{ secrets.FTP_PATH }}    # 👈 MUST END WITH /
+
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/node_modules/**
+            **/tests/**
+            .env
+            storage/logs/*
+            vendor/**
