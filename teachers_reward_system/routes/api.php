@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ParentController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SuperAdmin\SchoolController;
 use App\Http\Middleware\CheckRole;
@@ -13,6 +14,9 @@ use App\Http\Controllers\SchoolAdmin\SchoolTeacherManagementController;
 use App\Http\Controllers\SuperAdmin\GradeController;
 use App\Http\Controllers\SuperAdmin\DashboardController;
 use App\Http\Controllers\SchoolAdmin\SchoolAdminDashboardController;
+use App\Http\Controllers\Teacher\TeacherDashboardController;
+use App\Http\Controllers\Teacher\TeacherRatingRewardController;
+
 
 Route::post('/login',       [AuthController::class, 'login']);
 Route::post('/forgot',      [AuthController::class, 'forgotPassword']);
@@ -55,4 +59,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/schooladmin/dashboard', [SchoolAdminDashboardController::class, 'index']);
     });
+
+    Route::middleware(CheckRole::class . ':teacher')->group(function () {
+        Route::get('/teacher/dashboard', [TeacherDashboardController::class, 'index']);
+        Route::get('/teacher/ratings', [TeacherRatingRewardController::class, 'ratings']);
+        Route::get('/teacher/rewards', [TeacherRatingRewardController::class, 'rewards']);
+        Route::post('/teacher/withdraw', [TeacherRatingRewardController::class, 'requestWithdrawal']);
+    });
 });
+
+Route::post('/rate', [ParentController::class, 'rateTeacher']);
+Route::post('/reward', [ParentController::class, 'rewardTeacher']);
