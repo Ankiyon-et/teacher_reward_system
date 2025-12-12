@@ -55,4 +55,4 @@ jobs:
             **/tests/**
             .env
             storage/logs/*
-            vendor/
+            vendor/**
