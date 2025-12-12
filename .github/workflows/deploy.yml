@@ -17,7 +17,7 @@ jobs:
 
       # 2️⃣ Set local dir — Laravel project folder
       - name: Prepare local folder
-        run: echo "Using local dir: teachers_reward_system/"
+        run: echo "Using local dir:teachers_reward_system/"
 
       # 3️⃣ Setup PHP
       - name: Setup PHP
