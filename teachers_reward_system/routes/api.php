@@ -12,6 +12,7 @@ use App\Http\Controllers\SchoolAdmin\SchoolGradeManagementController;
 use App\Http\Controllers\SchoolAdmin\SchoolTeacherManagementController;
 use App\Http\Controllers\SuperAdmin\GradeController;
 use App\Http\Controllers\SuperAdmin\DashboardController;
+use App\Http\Controllers\SchoolAdmin\SchoolAdminDashboardController;
 
 Route::post('/login',       [AuthController::class, 'login']);
 Route::post('/forgot',      [AuthController::class, 'forgotPassword']);
@@ -51,5 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/grades/assign', [SchoolGradeManagementController::class, 'assignGradesToSchool']);
         Route::get('/school/grades', [SchoolGradeManagementController::class, 'schoolGrades']);
         Route::delete('/delete/grades/{gradeId}', [SchoolGradeManagementController::class, 'deleteSchoolGrade']);
+
+        Route::get('/schooladmin/dashboard', [SchoolAdminDashboardController::class, 'index']);
     });
 });
