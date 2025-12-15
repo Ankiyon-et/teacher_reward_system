@@ -13,24 +13,12 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // ================================
-        // 1. TOTAL SCHOOLS
-        // ================================
         $totalSchools = School::count();
 
-        // ================================
-        // 2. TOTAL TEACHERS
-        // ================================
         $totalTeachers = Teacher::count();
 
-        // ================================
-        // 3. TOTAL REWARDS PROCESSED
-        // ================================
         $totalRewardsProcessed = Reward::sum('amount');
 
-        // ================================
-        // 4. MONTHLY REWARD TREND (last 12 months)
-        // ================================
         $monthlyRewardTrend = Reward::select(
                 DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
                 DB::raw("SUM(amount) as total_amount")
@@ -40,10 +28,14 @@ class DashboardController extends Controller
             ->take(12)
             ->get();
 
-        // ================================
-        // 5. TOP PERFORMING SCHOOLS
-        // Ranking by total rewards received by their teachers
-        // ================================
+        $annualRewardTrend = Reward::select(
+                DB::raw("YEAR(created_at) as year"),
+                DB::raw("SUM(amount) as total_amount")
+            )
+            ->groupBy('year')
+            ->orderBy('year', 'asc')
+            ->get();
+
         $topPerformingSchools = School::select(
                 'schools.id',
                 'schools.name',
@@ -55,9 +47,6 @@ class DashboardController extends Controller
             ->orderByDesc('total_rewards')
             ->get();
 
-        // ================================
-        // 6. TEACHERS POPULATION PER SCHOOL
-        // ================================
         $teachersPopulation = School::select(
                 'schools.id',
                 'schools.name',
@@ -73,6 +62,7 @@ class DashboardController extends Controller
             'total_teachers' => $totalTeachers,
             'total_rewards_processed' => $totalRewardsProcessed,
             'monthly_reward_trend' => $monthlyRewardTrend,
+            'annual_reward_trend' => $annualRewardTrend,
             'top_performing_schools' => $topPerformingSchools,
             'teachers_population_per_school' => $teachersPopulation
         ]);

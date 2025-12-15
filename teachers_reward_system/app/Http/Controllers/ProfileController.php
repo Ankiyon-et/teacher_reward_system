@@ -10,6 +10,31 @@ use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
+    public function show(Request $request)
+    {
+        $user = $request->user()->load('role');
+
+        $profile = [
+            'user' => $user,
+            'role_profile' => null,
+        ];
+
+        switch ($user->role->role_name) {
+
+            case 'schooladmin':
+                $profile['role_profile'] = SchoolAdmin::where('user_id', $user->id)->first();
+                break;
+
+            case 'teacher':
+                $profile['role_profile'] = Teacher::where('user_id', $user->id)->first();
+                break;
+
+            // superadmin → no extra table
+        }
+
+        return response()->json($profile);
+    }
+
     public function update(Request $request)
     {
         $user = $request->user();

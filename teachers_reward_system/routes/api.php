@@ -27,8 +27,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
-
-    // USER MANAGEMENT (superadmin + schooladmin)
     
     Route::middleware(CheckRole::class . ':superadmin')->group(function () {
         Route::apiResource('schools', SchoolController::class);
@@ -68,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::post('/profile/update', [ProfileController::class, 'update']);
+    Route::get('/profile', [ProfileController::class, 'show']);
 
 });
 
