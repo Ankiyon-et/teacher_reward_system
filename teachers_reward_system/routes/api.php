@@ -59,7 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/schooladmin/dashboard', [SchoolAdminDashboardController::class, 'index']);
     });
     Route::middleware(CheckRole::class . ':teacher')->group(function () {
-        Route::get('/teacher/dashboard', [TeacherDashboardController::class, 'index']);
+        Route::get('/teacher/dashboard', [TeacherDashboardController::class, 'dashboard']);
         Route::get('/teacher/ratings', [TeacherRatingRewardController::class, 'ratings']);
         Route::get('/teacher/rewards', [TeacherRatingRewardController::class, 'rewards']);
         Route::post('/teacher/withdraw', [TeacherRatingRewardController::class, 'requestWithdrawal']);
