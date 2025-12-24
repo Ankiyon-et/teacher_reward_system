@@ -77,11 +77,23 @@ class SchoolTeacherManagementController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        // Cascade delete: teacher_grade, ratings, rewards, etc.
-        $teacher->user->delete();
+        DB::transaction(function () use ($teacher) {
+
+            // Detach grades
+            $teacher->grades()->detach();
+
+            // Delete teacher
+            $teacher->delete();
+
+            // Delete user
+            if ($teacher->user) {
+                $teacher->user->delete();
+            }
+        });
 
         return response()->json(['message' => 'Teacher deleted']);
     }
+
 
     private function authorizeRole($user, $allowed)
     {
