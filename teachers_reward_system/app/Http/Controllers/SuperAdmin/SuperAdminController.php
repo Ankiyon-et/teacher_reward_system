@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class SuperAdminController extends Controller
 {
@@ -30,9 +31,20 @@ class SuperAdminController extends Controller
 
     public function destroy($id)
     {
+        // Prevent self-deletion
+        if (Auth::id() == $id) {
+            return response()->json([
+                'message' => 'You cannot delete your own account'
+            ], 403);
+        }
+
+        // Only allow deleting super admins (role_id = 1)
         $user = User::where('role_id', 1)->findOrFail($id);
+
         $user->delete();
 
-        return response()->json(['message' => 'Super Admin deleted']);
+        return response()->json([
+            'message' => 'Super Admin deleted successfully'
+        ]);
     }
 }
