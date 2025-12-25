@@ -28,25 +28,31 @@ class SchoolAdminManagementController extends Controller
     {
         $this->authorizeRole($request->user(), 'schooladmin');
 
-        $schoolId = $request->user()->schoolAdmin->school_id;
+        $authUser = $request->user();
+        $schoolId = $authUser->schoolAdmin->school_id;
 
         $admin = SchoolAdmin::with('user')->findOrFail($adminId);
 
-        // Can only delete admins from the same school
-        if ($admin->school_id != $schoolId) {
+        // Ensure same school
+        if ($admin->school_id !== $schoolId) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        // Prevent deleting themselves
-        if ($admin->user_id == $request->user()->id) {
-            return response()->json(['message' => 'You cannot delete yourself'], 403);
+        // ❌ Prevent deleting own account
+        if ($admin->user_id === $authUser->id) {
+            return response()->json([
+                'message' => 'You cannot delete your own account'
+            ], 403);
         }
 
-        // This will cascade delete user + school_admin record
+        // Delete user (cascades to school_admin if FK is set correctly)
         $admin->user->delete();
 
-        return response()->json(['message' => 'School admin deleted']);
+        return response()->json([
+            'message' => 'School admin deleted successfully'
+        ]);
     }
+
 
     private function authorizeRole($user, $allowed)
     {
