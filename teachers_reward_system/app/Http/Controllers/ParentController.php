@@ -5,9 +5,47 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Rating;
 use App\Models\Reward;
+use App\Models\School;
+use App\Models\Grade;
+use App\Models\Teacher;
 
 class ParentController extends Controller
 {
+    public function schools()
+    {
+        return response()->json(
+            School::select('id', 'name', 'logo')->get()
+        );
+    }
+
+    // 2. Grades by school
+    public function grades(School $school)
+    {
+        return response()->json(
+            $school->grades()->select('grades.id', 'grades.name')->get()
+        );
+    }
+
+    // 3. Teachers by school + grade
+    public function teachers(School $school, Grade $grade)
+    {
+        $teachers = Teacher::where('school_id', $school->id)
+            ->whereHas('grades', function ($q) use ($grade) {
+                $q->where('grades.id', $grade->id);
+            })
+            ->with('user:id,name')
+            ->select(
+                'id',
+                'user_id',
+                'subject',
+                'profile_picture',
+                'average_rating'
+            )
+            ->get();
+
+        return response()->json($teachers);
+    }
+
     public function rateTeacher(Request $request)
     {
         $request->validate([

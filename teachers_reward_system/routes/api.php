@@ -72,3 +72,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::post('/rate', [ParentController::class, 'rateTeacher']);
 Route::post('/reward', [ParentController::class, 'rewardTeacher']);
+Route::get('/list/schools', [ParentController::class, 'schools']);
+Route::get('/list/grades/{school}', [ParentController::class, 'grades']);
+Route::get('/list/teachers/{school}/{grade}', [ParentController::class, 'teachers']);
