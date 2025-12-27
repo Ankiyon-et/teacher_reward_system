@@ -38,20 +38,25 @@ class SchoolAdminManagementController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        // ❌ Prevent deleting own account
+        // Prevent deleting own account
         if ($admin->user_id === $authUser->id) {
             return response()->json([
                 'message' => 'You cannot delete your own account'
             ], 403);
         }
 
-        // Delete user (cascades to school_admin if FK is set correctly)
-        $admin->user->delete();
+        // ✅ Delete both safely
+        if ($admin->user) {
+            $admin->user->delete();
+        }
+
+        $admin->delete();
 
         return response()->json([
             'message' => 'School admin deleted successfully'
         ]);
     }
+
 
 
     private function authorizeRole($user, $allowed)

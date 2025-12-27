@@ -44,7 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(CheckRole::class . ':schooladmin')->group(function () {
         Route::post('/create/school-admins', [UserManagementController::class, 'createSchoolAdmin']);
         Route::get('/list/school-admins', [SchoolAdminManagementController::class, 'index']);
-        Route::delete('/delete/school-admins/{adminId}', [SchoolAdminManagementController::class, 'destroy']);
+        Route::delete('/delete/school-admin/{adminId}', [SchoolAdminManagementController::class, 'destroy']);
 
         Route::post('/create/teachers', [UserManagementController::class, 'createTeacher']);
         Route::get('/list/teachers', [SchoolTeacherManagementController::class, 'index']);
